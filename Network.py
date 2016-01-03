@@ -17,20 +17,15 @@ class Network(object):
             ret[i] = np.random.randn(sizes[i], sizes[i + 1])
         return ret
 
-    def feedforward(self, a):
-        for n in range(self.n_lay - 1):
-            a = functions.sigmoid(np.dot(self.weights[n].T, a) + self.biases[n])
-        return a
-
-    def cost_function(self, X):
+    def cost_function(self, X, Y):
         cost = 0
-        for ex in X:
-            est = self.feedforward(np.reshape(ex[0:400], (400, 1)))
-            left = np.reshape(ex[400:410], (10, 1)) - np.log(est)
-            right = (1 - np.reshape(ex[400:410], (10, 1))) * np.log(1 - est)
-            cost = cost + np.sum(left - right) / 100
-        cost = cost / X.shape[0]
-        return cost
+        m = X.shape[0]
+        for n in range(self.n_lay - 1):
+            X = functions.sigmoid(np.dot(X, self.weights[n]) + self.biases[n].T)
+        left = -Y * np.log(X)
+        right = (1 - Y) * np.log(1 - X)
+        tmp = left - right
+        return np.mean(tmp)
 
     def gradient_descent(self, data, size, max_iter, lrate):
         '''

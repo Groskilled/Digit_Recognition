@@ -11,5 +11,5 @@ y_ = []
 for i in range(len(Y)):
     y_.append(np.array([[Y[i] % 10 == j] for j in range(10)], dtype=int).T[0][0])
 y_ = np.array(y_)
-X = np.c_[X, y_]
-net.gradient_descent(X, 400, 3, 0.1)
+X_ = np.c_[X, y_]
+net.cost_function(X, y_)
