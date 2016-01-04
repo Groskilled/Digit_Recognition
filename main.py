@@ -13,3 +13,4 @@ for i in range(len(Y)):
 y_ = np.array(y_)
 X_ = np.c_[X, y_]
 net.cost_function(X, y_)
+net.back_prop(X, y_, 0.3)
