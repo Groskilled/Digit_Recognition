@@ -76,9 +76,9 @@ class Network(object):
             X = np.c_[np.ones((X.shape[0], 1)), X]
             X = functions.sigmoid(np.dot(X, self.weights[n].T))
         for i in range(m - 1):
-            if np.array_equal(X[i], Y[i]):
+            if Y[i][np.argmax(X[i]) - 1] == 1:
                 right = right + 1
-        print right
+        print (right/m * 100)
 
     def gradient_descent(self, data, cicles, lrate):
         '''
