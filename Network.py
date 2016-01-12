@@ -51,6 +51,8 @@ class Network(object):
             for batch in batches: self.update(batch, lrate)
             if test_data:
                 print "Epoch {0}: {1} / {2}".format(i, self.evaluate(test_data), n)
+            else:
+                print "Epoch {0} is over.".format(i)
 
     def evaluate(self, X):
         total = 0
