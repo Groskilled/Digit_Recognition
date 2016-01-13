@@ -27,6 +27,17 @@ class Network2(object):
         a = x
         zs = []
         acts = [a]
+        for w,b in zip(self.weights, self.biases):
+            z = np.dot(a, w) + b.T
+            sg = functions.sigmoid_grad(z)
+            zs.append(z)
+            a = functions.sigmoid(z)
+            acts.append(a)
+        delta = ((a-y) * functions.sigmoid_grad(zs[-1])).T
+        weights = np.dot(acts[-2].T, delta.T)
+        print "delta: {0}, biases[-1]: {1}".format(delta.shape, self.biases[-1].shape)
+        print "weights: {0}, self.weights[-1]: {1}".format(weights.shape, self.weights[-1].shape)
+        #for i in xrange(2, self.n_lay):
         #Need to do this correctly
 
     def gradient_descent(self, data, cicles, size, lrate, test_set=None):
