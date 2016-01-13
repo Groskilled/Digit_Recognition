@@ -19,29 +19,15 @@ class Network2(object):
 
     def update(self, batch, lrate):
         x, y = zip(*batch)
+        m = len(x)
         x = np.array([i.T[0] for i in x])
         y = np.array([i.T[0] for i in y])
         dnabla_b = [np.zeros(b.shape) for b in self.biases]
         dnabla_w = [np.zeros(w.shape) for w in self.weights]
         a = x
         zs = []
-        acts = []
-        for w,b in zip(self.weights, self.biases):
-            z = np.dot(a, w) + b.T
-            zs.append(z)
-            a = functions.sigmoid(z)
-            acts.append(a)
-        delta = (a - y) * functions.sigmoid_grad(z)
-        dnabla_b[-1] = delta
-        dnabla_w[-1] = np.dot(delta.T, acts[-2]).T
-        for i in xrange(2, self.n_lay):
-            z = zs[-i]
-            print "self.weights[-i+1].shape: {0}".format(self.weights[-i + 1].shape)
-            print "delta.shape: {0}".format(delta.shape)
-            print "self.biases[-i].shape {0}".format(self.biases[-i].shape)
-            delta = np.dot(self.weights[-i + 1], delta.T)
-            print "delta.shape after dot: {0}".format(delta.shape)
-        return 1
+        acts = [a]
+        #Need to do this correctly
 
     def gradient_descent(self, data, cicles, size, lrate, test_set=None):
         n = len(data)
