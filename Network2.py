@@ -17,46 +17,47 @@ class Network2(object):
                 total = total + 1
         return total
 
+    def back_prop(self, x, y):
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        a = np.reshape(x,(x.shape[0],1))
+        y = np.reshape(y,(y.shape[0],1))
+        zs = []
+        acts = [a]
+        for w,b in zip(self.weights, self.biases):
+            z = np.dot(w.T, a) + b
+            zs.append(z)
+            a = functions.sigmoid(z)
+            acts.append(a)
+        delta = (a-y) * functions.sigmoid_grad(zs[-1])
+        nabla_b[-1] = delta
+        nabla_w[-1] = np.dot(acts[-2], delta.T)
+        for i in xrange(2, self.n_lay):
+            delta = np.dot(self.weights[-i+1], delta) * functions.sigmoid_grad(zs[-i])
+            nabla_b[-i] = delta
+            nabla_w[-i] = np.dot(acts[-i-1], delta.T)
+        return (nabla_b, nabla_w)
+
     def update(self, batch, lrate):
         x, y = zip(*batch)
         m = len(x)
         x = np.array([i.T[0] for i in x])
         y = np.array([i.T[0] for i in y])
-        dnabla_b = [np.zeros(b.shape) for b in self.biases]
-        dnabla_w = [np.zeros(w.shape) for w in self.weights]
-        a = x
-        zs = []
-        acts = [a]
-        for w,b in zip(self.weights, self.biases):
-            z = np.dot(a, w) + b.T
-            sg = functions.sigmoid_grad(z)
-            zs.append(z)
-            a = functions.sigmoid(z)
-            acts.append(a)
-        delta = ((a-y) * functions.sigmoid_grad(zs[-1])).T
-        dnabla_b[-1] = delta
-        dnabla_w[-1] = np.dot(acts[-2].T, delta.T)
-        for i in xrange(2, self.n_lay):
-            delta = np.dot(self.weights[-i+1], delta) * functions.sigmoid_grad(zs[-i].T)
-            dnabla_b[-i] = delta
-            dnabla_w[-i] = np.dot(acts[-i-1].T, delta.T)
-        '''
-        for i,j in zip(self.biases, dnabla_b):
-            print "biases: {0}, dnabla_b: {1}".format(i.shape, j.shape)
-        for i,j in zip(self.weights, dnabla_w):
-            print "weights: {0}, dnabla_w: {1}".format(i.shape, j.shape)
-        '''
-        #Need to do update biases and weights
-        #Weights are ok
-        #Biases are of shape (X, m) and need to be (X,1)
-        #maybe treat each example apart and update step by step
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        for a, b in zip(x,y):
+            dnabla_b, dnabla_w = self.back_prop(a, b)
+            nabla_b = [nb + dnb for nb,dnb in zip(nabla_b, dnabla_b)]
+            nabla_w = [nw + dnw for nw,dnw in zip(nabla_w, dnabla_w)]
+        self.biases = [b - (lrate / m) * nb for b,nb in zip(self.biases, nabla_b)]
+        self.weights = [w - (lrate / m) * nw for w,nw in zip(self.weights, nabla_w)]
 
     def gradient_descent(self, data, cicles, size, lrate, test_set=None):
         n = len(data)
         if test_set: n_test = len(test_set)
         for i in xrange(cicles):
             random.shuffle(data)
-            batches = [data[0:size]]
+            batches = [data[k:k+size] for k in xrange(0, n, size)]
             for batch in batches:
                 self.update(batch, lrate)
             if test_set:

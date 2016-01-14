@@ -23,4 +23,4 @@ for j in xrange(len(test_data)):
 tmpx = np.array(tmpx)
 X = np.array(X_)
 #print net.evaluate(tmpx, tmpy)
-net.gradient_descent(training_data, 5, 10, 1, test_data)
+net.gradient_descent(training_data, 10, 10, 1.0, test_data)
